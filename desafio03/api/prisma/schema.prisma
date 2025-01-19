@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  OTHER
+}
+
+enum AcademicStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  DROPPED_OUT
+  SUSPENDED
+}
+
+enum EducationMode {
+  PRESENTIAL
+  REMOTE
+  HYBRID
+}
+
+model User {
+  // Identificação
+  id               Int    @id @default(autoincrement())
+  name             String
+  dateOfBirth      DateTime
+  gender           Gender
+  cpf              String @unique
+  phone            String
+  email            String @unique
+  nationality      String
+  maritalStatus    MaritalStatus
+
+  // Dados Residenciais
+  address          String
+  street           String
+  number           String
+  complement       String? 
+  neighborhood     String
+  city             String
+  state            String
+  postalCode       String
+  country          String
+
+  // Dados Acadêmicos
+  registrationNumber String  @unique
+  course             String
+  yearOfEntry        Int
+  currentSemester    Int
+  academicStatus     AcademicStatus
+  gpa                Float?  
+  educationMode      EducationMode
+
+  // Informações Emergenciais
+  emergencyContact EmergencyContact[]
+}
+
+model EmergencyContact {
+  id          Int    @id @default(autoincrement())
+  name        String
+  relationship String
+  phone       String
+  email       String
+  userId      Int
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
