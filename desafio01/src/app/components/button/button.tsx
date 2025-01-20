@@ -4,9 +4,9 @@ import { ButtonInterface } from "./button.interface"
 
 export default function Button(props: ButtonInterface) {
     return (
-        <div>
+        <div className="flex ">
             <button 
-                className=""
+                className="bg-white mt-3 rounded-lg border-black p-1"
                 onClick={props.onClick}>
                 {props.name}
             </button>
