@@ -2,7 +2,9 @@
 
 export interface ButtonInterface {
     name: string
-    onClick: any
+    onClick?: any
+    type?: any
+    disabled?: any
 }
 
 export default function Button(props: ButtonInterface) {
@@ -10,7 +12,9 @@ export default function Button(props: ButtonInterface) {
         <div className="flex ">
             <button 
                 className="bg-white mt-3 rounded-lg border-black p-1"
-                onClick={props.onClick}>
+                onClick={props.onClick}
+                disabled={props.disabled}
+                >
                 {props.name}
             </button>
         </div>

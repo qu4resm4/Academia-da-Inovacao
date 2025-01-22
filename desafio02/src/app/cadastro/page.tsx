@@ -2,282 +2,297 @@
 import Pagina from "@/app/components/templates/pagina";
 import Input from "../components/templates/input";
 import Button from "../components/templates/button";
-import { Gender } from "./_types/gender";
-import { MaritalStatus } from "./_types/maritalstatus";
-import { EducationMode } from "./_types/educantionmode";
-import { AcademicStatus } from "./_types/academicstatus";
-import { useState } from "react";
 import Select from "../components/templates/select";
+import { Gender } from "../_types/gender";
+import { MaritalStatus } from "../_types/maritalstatus";
+import { EducationMode } from "../_types/educantionmode";
+import { AcademicStatus } from "../_types/academicstatus";
+import { useForm } from "react-hook-form";
+import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface UserData {
-    userIdentification: {
-        name: string;
-        dateOfBirth: string;
-        gender: Gender | null;
-        cpf: string;
-        phone: string;
-        email: string;
-        nationality: string;
-        maritalStatus: MaritalStatus | null;
-      };
-    userAddress: {
-        address: string;
-        street: string;
-        number: string;
-        complement: string;
-        neighborhood: string;
-        city: string;
-        state: string;
-        postalCode: string;
-        country: string;
-      };
-    userAcademic: {
-        registrationNumber: string;
-        course: string;
-        yearOfEntry: number;
-        currentSemester: number;
-        academicStatus: AcademicStatus | null;
-        gpa: number;
-        educationMode: EducationMode | null;
-      };
+const UserDataSchema = z.object({
+  userIdentification: z.object({
+    name: z.string().refine(value => value.trim() !== "", {
+        message: "O campo não pode estar vazio ou conter apenas espaços.",
+      }),
+    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)").refine(value => value.trim() !== "", {
+        message: "O campo não pode estar vazio ou conter apenas espaços.",
+      }),
+    gender: z.nativeEnum(Gender).nullable(),
+    cpf: z.string().regex(/^\d{11}$/, "CPF must be 11 digits"),
+    phone: z.string().min(10, "Phone number must have at least 10 digits"),
+    email: z.string().email("Invalid email format"),
+    nationality: z.string().min(1, "Nationality is required"),
+    maritalStatus: z.nativeEnum(MaritalStatus).nullable(),
+  }),
+  userAddress: z.object({
+    address: z.string().refine(value => value.trim() !== "", "Address is required"),
+    street: z.string().refine(value => value.trim() !== "", "Street is required"),
+    number: z.string().refine(value => value.trim() !== "", "Number is required"),
+    complement: z.string().optional(),
+    neighborhood: z.string().refine(value => value.trim() !== "", "Neighborhood is required"),
+    city: z.string().refine(value => value.trim() !== "", "City is required"),
+    state: z.string().refine(value => value.trim() !== "", "State is required"),
+    postalCode: z.string().regex(/^\d{5}-\d{3}$/, "Invalid postal code format (XXXXX-XXX)"),
+    country: z.string().refine(value => value.trim() !== "", "Country is required"),
+  }),
+  userAcademic: z.object({
+    registrationNumber: z.string().refine(value => value.trim() !== "", "Registration number is required"),
+    course: z.string().refine(value => value.trim() !== "", "Course is required"),
+    yearOfEntry: z.number().min(1900, "Year of entry must be valid").max(new Date().getFullYear()),
+    currentSemester: z.number().min(1, "Semester must be at least 1").max(20, "Semester must not exceed 20"),
+    academicStatus: z.nativeEnum(AcademicStatus).nullable(),
+    gpa: z.number().min(0, "GPA must be at least 0").max(10, "GPA must not exceed 10"),
+    educationMode: z.nativeEnum(EducationMode).nullable(),
+  }),
+  userEmergencyContact: z.object({
+    name: z.string().refine(value => value.trim() !== "", "Contact name is required"),
+    relationship: z.string().refine(value => value.trim() !== "", "Relationship is required"),
+    phone: z.string().min(10, "Phone number must have at least 10 digits"),
+    email: z.string().email("Invalid email format"),
+  }),
+});
 
-    userContact: {
-        name: string;
-        relationship: string;
-        phone: string;
-        email: string;
-      }[];
-}
+export type CreateUser = z.infer<typeof UserDataSchema>;
 
-export default function Cadastro() {
-    // userIdentification
-    const [name, setName] = useState<string>("");
-    const [dateOfBirth, setDateOfBirth] = useState<string>("");
-    const [gender, setGender] = useState<Gender | null>(null);
-    const [cpf, setCpf] = useState<string>("");
-    const [phone, setPhone] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [nationality, setNationality] = useState<string>("");
-    const [maritalStatus, setMaritalStatus] = useState<MaritalStatus | null>(null);
+export default function Cadastro() {    
+    const { register, handleSubmit, formState: { errors, isValid } } = useForm<CreateUser>(
+        {
+            resolver: zodResolver(UserDataSchema)
+        }
+    );
 
-    // userAddress
-    const [address, setAddress] = useState<string>("");
-    const [street, setStreet] = useState<string>("");
-    const [number, setNumber] = useState<string>("");
-    const [complement, setComplement] = useState<string>("");
-    const [neighborhood, setNeighborhood] = useState<string>("");
-    const [city, setCity] = useState<string>("");
-    const [state, setState] = useState<string>("");
-    const [postalCode, setPostalCode] = useState<string>("");
-    const [country, setCountry] = useState<string>("");
-
-    // userAcademic
-    const [registrationNumber, setRegistrationNumber] = useState<string>("");
-    const [course, setCourse] = useState<string>("");
-    const [yearOfEntry, setYearOfEntry] = useState<number>(2023);
-    const [currentSemester, setCurrentSemester] = useState<number>(1);
-    const [academicStatus, setAcademicStatus] = useState<AcademicStatus | null>(null);
-    const [gpa, setGpa] = useState<number>(0);
-    const [educationMode, setEducationMode] = useState<EducationMode | null>(null);
+    function handleCreateUser(data: CreateUser) {
+        console.log(data)
+    }
     
-    function submit() {
-        const payload = {
-          userIdentification: {
-            name,
-            dateOfBirth,
-            gender,
-            cpf,
-            phone,
-            email,
-            nationality,
-            maritalStatus,
-          },
-          userAddress: {
-            address,
-            street,
-            number,
-            complement,
-            neighborhood,
-            city,
-            state,
-            postalCode,
-            country,
-          },
-          userAcademic: {
-            registrationNumber,
-            course,
-            yearOfEntry,
-            currentSemester,
-            academicStatus,
-            gpa,
-            educationMode,
-          },
-        };
-      
-        console.log("Payload preparado para envio:", JSON.stringify(payload, null, 2));
-        
-        // Aqui você pode enviar o payload para o backend, por exemplo:
-        // fetch("URL_DO_BACKEND", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify(payload),
-        // })
-        //   .then(response => response.json())
-        //   .then(data => console.log("Resposta do backend:", data))
-        //   .catch(error => console.error("Erro ao enviar os dados:", error));
-      }
-      
-
     return (
             <Pagina>
                 <div className="flex justify-center">
                     <div className="m-8 p-8 bg-neutral-700 rounded-xl flex flex-col gap-6">
-                        <div className="flex gap-6">
-                            {/*Informações de Identificação*/}
-                            <div>
-                                <Input
-                                    onChange={(e: any) => setName(e.target.value)}
-                                    label={"Nome"}
-                                    type={'text'}
-                                />
+                        <form className="flex flex-col gap-2">
+                            <div className="flex gap-6">
+                                {/* Informações de Identificação */}
+                                <div>
+                                    <h2 className="text-white text-2xl">Dados Pessoais</h2>
+                                    <Input 
+                                        register={register} 
+                                        name="userIdentification.name"
+                                        label="Nome"
+                                        type="text" 
+                                        error={errors.userIdentification?.name?.message}
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userIdentification.dateOfBirth"
+                                        label="Data de Nascimento" 
+                                        type="date" 
+                                        error={errors.userIdentification?.dateOfBirth?.message}
+                                    />
+                                    <Select
+                                        register={register} 
+                                        name="userIdentification.gender"
+                                        label="Gênero"
+                                        enumOptions={Gender}
+                                        error={errors.userIdentification?.gender?.message}
+                                    />
+                                    <Input
+                                        register={register} 
+                                        name="userIdentification.cpf"
+                                        label="CPF" 
+                                        type="text"
+                                        error={errors.userIdentification?.cpf?.message}
+                                    />
+                                    <Input
+                                        register={register} 
+                                        name="userIdentification.phone"
+                                        label="Celular" 
+                                        type="text" 
+                                        error={errors.userIdentification?.phone?.message}
+                                    />
+                                    <Input
+                                        register={register} 
+                                        name="userIdentification.email"
+                                        label="E-mail" 
+                                        type="email"
+                                        error={errors.userIdentification?.email?.message} 
+                                    />
+                                    <Input
+                                        register={register} 
+                                        name="userIdentification.nationality"
+                                        label="Nacionalidade" 
+                                        type="text" 
+                                        error={errors.userIdentification?.nationality?.message}
+                                    />
+                                    <Select
+                                        register={register} 
+                                        name="userIdentification.maritalStatus"
+                                        label="Estado Civil"
+                                        enumOptions={MaritalStatus}
+                                        error={errors.userIdentification?.maritalStatus?.message}
+                                    />
+                                </div>
+                                
+                                {/* Informações de Endereço */}
+                                <div>
+                                    <h2 className="text-white text-2xl">Dados Residenciais</h2>
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.address"
+                                        label="Endereço" 
+                                        type="text" 
+                                        error={errors.userAddress?.address?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.street"
+                                        label="Rua" 
+                                        type="text" 
+                                        error={errors.userAddress?.street?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.number"
+                                        label="Número" 
+                                        type="text" 
+                                        error={errors.userAddress?.number?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.complement"
+                                        label="Complemento" 
+                                        type="text" 
+                                        error={errors.userAddress?.complement?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.neighborhood"
+                                        label="Bairro" 
+                                        type="text" 
+                                        error={errors.userAddress?.neighborhood?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.city"
+                                        label="Cidade" 
+                                        type="text" 
+                                        error={errors.userAddress?.city?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.state"
+                                        label="Estado" 
+                                        type="text" 
+                                        error={errors.userAddress?.state?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.postalCode"
+                                        label="CEP" 
+                                        type="text" 
+                                        error={errors.userAddress?.postalCode?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAddress.country"
+                                        label="País" 
+                                        type="text" 
+                                        error={errors.userAddress?.country?.message} 
+                                    />
+                                </div>
 
-                                <Input
-                                    onChange={(e: any) => setDateOfBirth(e.target.value)}
-                                    label={"Data de Nascimento"}
-                                    type={'date'}
-                                />
+                                {/* Informações Acadêmicas */}
+                                <div>
+                                    <h2 className="text-white text-2xl">Dados Acadêmicos</h2>
+                                    <Input 
+                                        register={register} 
+                                        name="userAcademic.registrationNumber"
+                                        label="Número de Matrícula" 
+                                        type="text" 
+                                        error={errors.userAcademic?.registrationNumber?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAcademic.course"
+                                        label="Curso" 
+                                        type="text" 
+                                        error={errors.userAcademic?.course?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAcademic.yearOfEntry"
+                                        label="Ano de Entrada" 
+                                        type="number" 
+                                        error={errors.userAcademic?.yearOfEntry?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAcademic.currentSemester"
+                                        label="Semestre Atual" 
+                                        type="number" 
+                                        error={errors.userAcademic?.currentSemester?.message} 
+                                    />
+                                    <Select
+                                        register={register} 
+                                        name="userAcademic.academicStatus"
+                                        label="Status Acadêmico"
+                                        enumOptions={AcademicStatus}
+                                        error={errors.userAcademic?.academicStatus?.message}
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userAcademic.gpa"
+                                        label="GPA" 
+                                        type="number" 
+                                        error={errors.userAcademic?.gpa?.message} 
+                                    />
+                                    <Select
+                                        register={register} 
+                                        name="userAcademic.educationMode"
+                                        label="Modalidade de Ensino"
+                                        enumOptions={EducationMode}
+                                        error={errors.userAcademic?.educationMode?.message}
+                                    />
+                                </div>
 
-                                <Select
-                                    label="Gênero"
-                                    name='Gender'
-                                    onChange={(e: any) => setGender(e.target.value)}
-                                    enumOptions={Gender}
-                                />
-
-                                <Input
-                                    onChange={(e: any) => setCpf(e.target.value)}
-                                    label={"CPF"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setPhone(e.target.value)}
-                                    label={"Celular"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setEmail(e.target.value)}
-                                    label={"E-mail"}
-                                    type={'email'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setNationality(e.target.value)}
-                                    label={"Nacionalidade"}
-                                    type={'text'}
-                                />
-                                <Select
-                                    label="Estado Civil"
-                                    name='MaritalStatus'
-                                    onChange={(e: any) => setMaritalStatus(e.target.value)}
-                                    enumOptions={MaritalStatus}
-                                />
+                                {/* Informações Emergenciais */}
+                                <div>
+                                    <h2 className="text-white text-2xl">Contato de Emergência</h2>
+                                    <Input 
+                                        register={register} 
+                                        name="userEmergencyContact.name"
+                                        label="Nome" 
+                                        type="text" 
+                                        error={errors.userEmergencyContact?.name?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userEmergencyContact.relationship"
+                                        label="Parentesco" 
+                                        type="text" 
+                                        error={errors.userEmergencyContact?.relationship?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userEmergencyContact.phone"
+                                        label="Telefone" 
+                                        type="text" 
+                                        error={errors.userEmergencyContact?.phone?.message} 
+                                    />
+                                    <Input 
+                                        register={register} 
+                                        name="userEmergencyContact.email"
+                                        label="E-mail" 
+                                        type="email" 
+                                        error={errors.userEmergencyContact?.email?.message} 
+                                    />
+                                </div>
                             </div>
-
-                            {/*Informações de Endereço*/}
-                            <div>
-                                <Input
-                                    onChange={(e: any) => setAddress(e.target.value)}
-                                    label={"Endereço"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setStreet(e.target.value)}
-                                    label={"Rua"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setNumber(e.target.value)}
-                                    label={"Número"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setComplement(e.target.value)}
-                                    label={"Complemento"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setNeighborhood(e.target.value)}
-                                    label={"Bairro"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setCity(e.target.value)}
-                                    label={"Cidade"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setState(e.target.value)}
-                                    label={"Estado"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setPostalCode(e.target.value)}
-                                    label={"CEP"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setCountry(e.target.value)}
-                                    label={"País"}
-                                    type={'text'}
-                                />
+                            <div className="flex justify-center">
+                                <Button onClick={handleSubmit(handleCreateUser)} disabled={!isValid} name={"Cadastrar"}/>
                             </div>
-
-                            {/*Informações Acadêmicas*/}
-                            <div>
-                                <Input
-                                    onChange={(e: any) => setRegistrationNumber(e.target.value)}
-                                    label={"Número de Matrícula"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setCourse(e.target.value)}
-                                    label={"Curso"}
-                                    type={'text'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setYearOfEntry(Number(e.target.value))}
-                                    label={"Ano de Entrada"}
-                                    type={'number'}
-                                />
-                                <Input
-                                    onChange={(e: any) => setCurrentSemester(Number(e.target.value))}
-                                    label={"Semestre Atual"}
-                                    type={'number'}
-                                />
-                                <Select
-                                    label="Status Acadêmico"
-                                    name='AcademicStatus'
-                                    onChange={(e: any) => setAcademicStatus(e.target.value)}
-                                    enumOptions={AcademicStatus}
-                                />
-                                <Input
-                                    onChange={(e: any) => setGpa(Number(e.target.value))}
-                                    label={"GPA"}
-                                    type={'number'}
-                                />
-                                <Select
-                                    label="Modalidade de Ensino"
-                                    name='EducationMode'
-                                    onChange={(e: any) => setEducationMode(e.target.value)}
-                                    enumOptions={EducationMode}
-                                />
-                            </div>
-                        </div>
-    
-                        <div className="flex justify-center">
-                            <Button onClick={submit()} name={"Cadastrar"}/>
-                        </div>
+                        </form>                    
                     </div>
                 </div>
             </Pagina>

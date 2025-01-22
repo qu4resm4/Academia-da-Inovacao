@@ -4,7 +4,8 @@ export interface SelectInterface {
     label: string
     name?: string
     enumOptions: any
-    onChange: any
+    error?: any
+    register: any
 }
 
 export default function Button(props: SelectInterface) {
@@ -13,7 +14,7 @@ export default function Button(props: SelectInterface) {
             <label className="text-lg text-white">
                 {props.label}
             </label>
-            <select onChange={props.onChange} name={props.name} id="">
+            <select {...props.register(props.name)} name={props.name} id="">
               <option value="">Selecione uma opção</option>
               {Object.keys(props.enumOptions).map((key) => (
                 <option key={key} value={key}>
@@ -21,6 +22,7 @@ export default function Button(props: SelectInterface) {
                 </option>
               ))}
             </select>
+            {props.error && <p className="text-red-500 text-sm">{props.error}</p>}
         </div>
     )
 }

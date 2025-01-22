@@ -1,10 +1,15 @@
 'use client'
 
+import { FieldValues, UseFormRegister } from "react-hook-form"
+
 interface InputInterface {
     label: string
-    onChange: any
+    onChange?: any
     type: string
     value?: any
+    error?: any
+    register: any
+    name: string
 }
 
 export default function Input(props: InputInterface) {
@@ -13,7 +18,8 @@ export default function Input(props: InputInterface) {
             <label className="text-lg text-white">
                 {props.label}
             </label>
-            <input onChange={props.onChange} type={props.type} value={props.value}/>
+            <input type={props.type} {...props.register(props.name)} value={props.value}/>
+            {props.error && <p className="text-red-500 text-sm">{props.error}</p>}
         </div>
     )
 }
