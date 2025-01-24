@@ -14,6 +14,7 @@ export class UsersController {
   /* fazendo este */
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
+    console.log("requisição pra criar")
     return this.usersService.create(createUserDto);
   }
 

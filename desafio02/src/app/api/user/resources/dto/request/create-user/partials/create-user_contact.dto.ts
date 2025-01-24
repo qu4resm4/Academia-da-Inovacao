@@ -1,4 +1,3 @@
-import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
 
 export class CreateUserContactDto {
   name: string;

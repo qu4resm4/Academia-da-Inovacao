@@ -19,5 +19,5 @@ export class CreateUserDto {
 
   @ValidateNested()
   @IsNotEmpty()
-  userContact: CreateUserContactDto;
+  userEmergencyContact: CreateUserContactDto;
 }

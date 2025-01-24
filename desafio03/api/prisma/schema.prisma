@@ -46,7 +46,7 @@ model User {
   // Identificação
   id               Int    @id @default(autoincrement())
   name             String
-  dateOfBirth      DateTime
+  dateOfBirth      DateTime @db.Date
   gender           Gender
   cpf              String @unique
   phone            String

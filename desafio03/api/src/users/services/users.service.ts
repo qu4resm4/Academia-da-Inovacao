@@ -1,13 +1,11 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/request/create-user/create-user.dto';
 import { UpdateUserDto } from '../dto/request/update-user/update-user.dto';
-import { ResponseEntity } from 'src/util/response.entity';
-import { UserPublicDto } from '../dto/response/user-public/user-public.dto';
 import { UserPrivateDto } from '../dto/response/user-private/user-private.dto';
-import { UserEntity } from '../entities/user.entity';
+import { userAge } from '../../util/functions/user-ager.function';
 import { Prisma } from '@prisma/client';
-import { userAge } from './functions/user-ager.function';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserPublicDto } from '../dto/response/user-public/user-public.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,31 +13,30 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const { userIdentification, userAddress, userAcademic, userContact } = createUserDto;
+  /*try {*/
+      const { userIdentification, userAddress, userAcademic, userEmergencyContact } = createUserDto;
       
       const user = await this.prisma.user.create({
         data: {
           ...userIdentification,
+          dateOfBirth: new Date(userIdentification.dateOfBirth),
           ...userAddress,
           ...userAcademic,
           emergencyContact: {
             create: {
-              ...userContact
-            }
-        }
-      }})
+              ...userEmergencyContact,
+            },
+          },
+        }});
       return `http://localhost:3000/users/${user.id}`;
-    } catch (erro) {
+   /* } catch (erro) {
       if (erro instanceof Prisma.PrismaClientKnownRequestError) {
         const field = erro.meta.target.toString()
         throw new HttpException(`Os campos '${field}' já estão registrados. Não será possível cadastrá-lo novamente, acesse o usuário correspondente.`, HttpStatus.BAD_REQUEST);
       }
-    }
+    }*/
   }
-
-  /*paginação*/
-  async findAll() {
+async findAll() {
     let response: UserPublicDto[] = [];
     const users = await this.prisma.user.findMany({
       include: {
@@ -49,6 +46,7 @@ export class UsersService {
 
     users.forEach(u => {
       const addingUser = new UserPublicDto(u);
+      response.push(addingUser)
     });
 
     return response;
@@ -97,4 +95,3 @@ export class UsersService {
     }
   }
 }
-

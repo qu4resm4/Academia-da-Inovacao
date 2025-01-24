@@ -7,7 +7,7 @@ export class UserPrivateDto {
   userIdentification: UserPrivateIdentificationDto;
   userAddress: UserPrivateAddressDto;
   userAcademic: UserPrivateAcademicDto;
-  userContact: UserPrivateContactDto[];
+  userEmergencyContact: UserPrivateContactDto[];
 
   constructor(user, age){
     this.userIdentification = {
@@ -44,7 +44,7 @@ export class UserPrivateDto {
       educationMode: user.educationMode
     };
 
-    this.userContact = user.emergencyContact as UserPrivateContactDto[];
+    this.userEmergencyContact = user.emergencyContact as UserPrivateContactDto[];
     
   }
 }

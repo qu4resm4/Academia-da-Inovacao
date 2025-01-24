@@ -14,7 +14,7 @@ CREATE TYPE "EducationMode" AS ENUM ('PRESENTIAL', 'REMOTE', 'HYBRID');
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "dateOfBirth" TIMESTAMP(3) NOT NULL,
+    "dateOfBirth" DATE NOT NULL,
     "gender" "Gender" NOT NULL,
     "cpf" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
