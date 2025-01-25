@@ -1,4 +1,4 @@
-class HelloWord extends HTMLElement{
+export class HelloWord extends HTMLElement{
     constructor(){
         super();
         this.attachShadow({
@@ -17,5 +17,3 @@ class HelloWord extends HTMLElement{
         `
     }
 }
-
-customElements.define('hello-word', HelloWord)
