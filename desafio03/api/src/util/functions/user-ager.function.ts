@@ -1,4 +1,4 @@
-export function userAge(dateOfBirth: Date) {
+export function userAgeCalculation(dateOfBirth: Date) {
   const today = new Date();
 
   // Diferença entre os anos

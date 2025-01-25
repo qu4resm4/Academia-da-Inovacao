@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../dto/request/create-user/create-user.dto';
 import { UpdateUserDto } from '../dto/request/update-user/update-user.dto';
 import { UserPrivateDto } from '../dto/response/user-private/user-private.dto';
-import { userAge } from '../../util/functions/user-ager.function';
+import { userAgeCalculation } from '../../util/functions/user-ager.function';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserPublicDto } from '../dto/response/user-public/user-public.dto';
@@ -27,7 +27,8 @@ export class UsersService {
               ...userEmergencyContact,
             },
           },
-        }});
+        }
+      });
       return `http://localhost:3000/users/${user.id}`;
    /* } catch (erro) {
       if (erro instanceof Prisma.PrismaClientKnownRequestError) {
@@ -52,6 +53,14 @@ async findAll() {
     return response;
   }
 
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique(
+      {
+        where: { email }
+      }
+    )
+  }
+
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -59,29 +68,49 @@ async findAll() {
         emergencyContact: true
       }
     });
-
     if (!user) {
       throw new HttpException(`Usuário com ID ${id} não encontrado`, HttpStatus.NOT_FOUND);
     }
 
-    const age = userAge(user.dateOfBirth);
+    const age = userAgeCalculation(user.dateOfBirth);
 
-    return new UserPrivateDto(user, age);
+    const dateOfBirth = user.dateOfBirth.toISOString().split('T')[0];
+    
+    return new UserPrivateDto(user, age, dateOfBirth);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: CreateUserDto) {
+    const { userIdentification, userAddress, userAcademic, userEmergencyContact } = updateUserDto;
     const user = await this.prisma.user.update({
       where: { id },
-      data: updateUserDto
+      data: {
+        ...userIdentification,
+        dateOfBirth: new Date(userIdentification.dateOfBirth),
+        ...userAddress,
+        ...userAcademic,
+        emergencyContact: {
+          update: {
+            where: {
+              id: id,
+            },
+            data: {...userEmergencyContact},
+          },
+        },
+      },
+      include: {
+        emergencyContact: true,
+      },
     })
 
     if (!user) {
       throw new HttpException(`Usuário com ID ${id} não encontrado`, HttpStatus.NOT_FOUND);
     }
 
-    const age = userAge(user.dateOfBirth);
+    const age = userAgeCalculation(user.dateOfBirth);
 
-    return new UserPrivateDto(user, age);
+    const dateOfBirth = user.dateOfBirth.toISOString().split('T')[0];
+    
+    return new UserPrivateDto(user, age, dateOfBirth);
   }
 
   async remove(id: number) {

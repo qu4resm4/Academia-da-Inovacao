@@ -10,15 +10,16 @@ import { AcademicStatus } from "../../_types/academicstatus";
 import { useForm } from "react-hook-form";
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useUsers from '../../hooks/useUsers'
+import { Toaster, toast } from "sonner";
 
 const UserDataSchema = z.object({
   userIdentification: z.object({
     name: z.string().refine(value => value.trim() !== "", {
         message: "O campo não pode estar vazio ou conter apenas espaços.",
       }),
-    dateOfBirth: z.string(),
+    dateOfBirth: z.coerce.date(),
     gender: z.nativeEnum(Gender).nullable(),
     cpf: z.string().regex(/^\d{11}$/, "CPF must be 11 digits"),
     phone: z.string().min(10, "Phone number must have at least 10 digits"),
@@ -61,25 +62,44 @@ interface FormInterface {
     isDisabled: boolean
 }
 
+interface UserData {
+    data?: CreateUser;
+    error?: any;
+}
+
 export default function Form(props: FormInterface) {
     const { fetchUsers, fetchCurrentUser, create, update, deleteUser } = useUsers()
 
     /* REGISTRAR */
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm<CreateUser>(
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<CreateUser>(
         {
             resolver: zodResolver(UserDataSchema)
         }
     );
 
     function handleCreateUser(data: CreateUser) {
-        /** data está vindo de onde? */
-        console.log("CRIANDO: ", data);
-        let response = create(data);
-        console.log("response", response)
+        create(data)
     }
 
-    /* ATUALIZAR E DELETAR */
+    /* LER, ATUALIZAR E DELETAR */
     const isDashboard = props.isDisabled;
+
+    /* LENDO DADOS EXISTENTES */
+    let userId = 3;
+    useEffect(() => {
+        if (isDashboard) {
+            const fetchData = async () => {
+                try {
+                    const dataUser = await fetchCurrentUser(userId);
+                    reset(dataUser.data)
+                } catch (err) {
+                    console.error("Error fetching user:", err);
+                }
+            };
+
+            fetchData();
+        }
+    }, [isDashboard, userId, reset]); 
 
     /* ATUALIZAR */
     const [isDisabled, setIsDisabled] = useState<boolean>(props.isDisabled);
@@ -88,17 +108,18 @@ export default function Form(props: FormInterface) {
         setIsDisabled(!isDisabled);
     }
 
-    function handleUpdateUser(jwt: any, data: any) {
-        
+    function handleUpdateUser(data: CreateUser, jwt: any) {
+        update(jwt, data)
     }
 
     /* DELETE */
-    function handleDeleteeUser(jwt: any) {
-
+    function handleDeleteUser(jwt: any) {
+        deleteUser(jwt)
     }
-    
+
     return (
                 <div className="flex justify-center">
+                    <Toaster />
                     <div className="m-8 p-8 bg-neutral-700 rounded-xl flex flex-col gap-6">
                         <form className="flex flex-col gap-2">
                             <div className="flex gap-6">
@@ -345,7 +366,7 @@ export default function Form(props: FormInterface) {
                                         error={errors.userEmergencyContact?.email?.message}
                                         disabled={isDisabled}
                                     />
-                                </div>
+                                </div> 
                             </div>        
                             <div className="flex justify-center">
                                 {
@@ -365,19 +386,19 @@ export default function Form(props: FormInterface) {
                                 {   
                                     isDashboard && !isDisabled
                                     ?
-                                    <Button onClick={handleSubmit(handleUpdateUser)} name={"Atualizar"}/>
+                                    <Button onClick={handleSubmit((data) => handleUpdateUser(data, userId))} name={"Atualizar"}/>
                                     :
                                     null
                                 }
                                 {
                                     isDashboard
                                     ?
-                                    <Button onClick={handleSubmit(handleDeleteeUser)} name={"Excluir"}/>
+                                    <Button onClick={() => handleDeleteUser(userId)} name={"Excluir"}/>
                                     :
                                     null
                                 }
                             </div>
-                        </form>                    
+                        </form>             
                     </div>
                 </div>
     )
