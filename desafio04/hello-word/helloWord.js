@@ -13,7 +13,7 @@ class HelloWord extends HTMLElement{
                     color: white;
                 }
             </style>
-            <div>Hello Word</div>
+            <div>Olá, Mundo! Eu sou um Web Component!</div>
         `
     }
 }
