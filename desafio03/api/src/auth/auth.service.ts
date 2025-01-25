@@ -13,11 +13,11 @@ export class AuthService {
   async signin(params: any) {
     const user = await this.usersService.findByEmail(params.email)
     if (user && user.cpf === params.cpf) {
-      const payload = { username: user.name, id: user.id };
+      const payload = { username: user.name, sub: user.id };
 
       return await this.jwtService.signAsync(payload);
     } else {
-      return { error: 'DEU RUIM MEU CHAPA'}
+      return 'invalid'
     }
   }
 }

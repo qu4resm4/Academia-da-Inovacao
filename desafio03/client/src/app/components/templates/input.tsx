@@ -9,7 +9,7 @@ interface InputInterface {
     error?: any
     register: any
     name: string
-    disabled: boolean
+    disabled?: boolean
 }
 
 export default function Input(props: InputInterface) {
@@ -18,7 +18,7 @@ export default function Input(props: InputInterface) {
             <label className="text-lg text-white">
                 {props.label}
             </label>
-            <input type={props.type} {...props.register(props.name)} value={props.value} disabled={props.disabled}/>
+            <input type={props.type} {...props.register(props.name)} value={props.value} disabled={props.disabled || false}/>
             {props.error && <p className="text-red-500 text-sm">{props.error}</p>}
         </div>
     )

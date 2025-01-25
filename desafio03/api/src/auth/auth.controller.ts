@@ -12,11 +12,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async signin(@Body() body, @Res() res: Response) {
     const token = await this.authService.signin(body);
+
+    if (token == 'invalid') {
+      res.cookie('token', null);
+      // Credenciais inválidas
+      return res.status(HttpStatus.UNAUTHORIZED).send({ message: 'Credenciais inválidas' });
+    }
+
     res.cookie('token', token, {
-      httpOnly: true, // Impede que o cookie seja acessado por JavaScript
-      sameSite: 'strict', // Evita CSRF
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
     });
+    
     return res.status(200).send({ message: 'Login bem-sucedido' });
   }
 }

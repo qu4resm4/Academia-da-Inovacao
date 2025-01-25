@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import useUsers from '../../hooks/useUsers'
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 
 const UserDataSchema = z.object({
   userIdentification: z.object({
@@ -85,12 +85,11 @@ export default function Form(props: FormInterface) {
     const isDashboard = props.isDisabled;
 
     /* LENDO DADOS EXISTENTES */
-    let userId = 3;
     useEffect(() => {
         if (isDashboard) {
             const fetchData = async () => {
                 try {
-                    const dataUser = await fetchCurrentUser(userId);
+                    const dataUser = await fetchCurrentUser();
                     reset(dataUser.data)
                 } catch (err) {
                     console.error("Error fetching user:", err);
@@ -99,7 +98,7 @@ export default function Form(props: FormInterface) {
 
             fetchData();
         }
-    }, [isDashboard, userId, reset]); 
+    }, [isDashboard, reset]); 
 
     /* ATUALIZAR */
     const [isDisabled, setIsDisabled] = useState<boolean>(props.isDisabled);
@@ -108,13 +107,13 @@ export default function Form(props: FormInterface) {
         setIsDisabled(!isDisabled);
     }
 
-    function handleUpdateUser(data: CreateUser, jwt: any) {
-        update(jwt, data)
+    function handleUpdateUser(data: CreateUser) {
+        update(data)
     }
 
     /* DELETE */
-    function handleDeleteUser(jwt: any) {
-        deleteUser(jwt)
+    function handleDeleteUser() {
+        deleteUser()
     }
 
     return (
@@ -386,14 +385,14 @@ export default function Form(props: FormInterface) {
                                 {   
                                     isDashboard && !isDisabled
                                     ?
-                                    <Button onClick={handleSubmit((data) => handleUpdateUser(data, userId))} name={"Atualizar"}/>
+                                    <Button onClick={handleSubmit((data) => handleUpdateUser(data))} name={"Atualizar"}/>
                                     :
                                     null
                                 }
                                 {
                                     isDashboard
                                     ?
-                                    <Button onClick={() => handleDeleteUser(userId)} name={"Excluir"}/>
+                                    <Button onClick={() => handleDeleteUser} name={"Excluir"}/>
                                     :
                                     null
                                 }
