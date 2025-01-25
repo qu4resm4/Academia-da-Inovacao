@@ -1,11 +1,6 @@
-import {
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/services/users.service';
-import { identity } from 'rxjs';
 
 @Injectable()
 export class AuthService {

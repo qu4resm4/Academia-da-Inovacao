@@ -1,12 +1,5 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Inject,
-  Post,
+import { Body, Controller, HttpCode, HttpStatus, Inject, Post,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { AuthService } from './auth.service';
 
 @Controller('login')
