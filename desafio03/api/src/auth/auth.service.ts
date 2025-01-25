@@ -15,7 +15,7 @@ export class AuthService {
     if (user && user.cpf === params.cpf) {
       const payload = { username: user.name, id: user.id };
 
-      return { access_token: await this.jwtService.signAsync(payload) };
+      return await this.jwtService.signAsync(payload);
     } else {
       return { error: 'DEU RUIM MEU CHAPA'}
     }

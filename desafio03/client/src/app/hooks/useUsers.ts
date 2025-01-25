@@ -24,6 +24,7 @@ export default function useUsers() {
         try {
             const response = await fetch(`${URL}/${id}`, {
                 method: "GET",
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -70,6 +71,7 @@ export default function useUsers() {
             let response;
             await fetch(`${URL}/${id}`, {
                 method: "PATCH",
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -98,6 +100,7 @@ export default function useUsers() {
             let response;
             await fetch(`${URL}/${id}`, {
                 method: "DELETE",
+                credentials: 'include'
             }).then(
                 (resp) => {
                     response = resp

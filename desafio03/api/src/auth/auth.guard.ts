@@ -9,11 +9,11 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const authorization = this.extractTokenFromHeader(request);
-    if (!authorization) throw new UnauthorizedException('Esta rota exige um token');
+    const token = request.cookies?.token;
+    if (!token) throw new UnauthorizedException('Esta rota exige um token');
 
     try {
-      const payload = this.jwtService.verify(authorization, {
+      const payload = this.jwtService.verify(token, {
         secret: process.env.SECRET_KEY,
       });
       request['id'] = payload;
