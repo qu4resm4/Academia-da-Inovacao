@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Componente de Card Interativo
 
-## Getting Started
+Este repositório contém a implementação de um desafio proposto em um bootcamp, com o objetivo de criar um componente de card interativo. O componente permite alterar seus próprios valores quando o usuário preenche um input e executa a ação de troca ao apertar um botão.
 
-First, run the development server:
+## Descrição
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Utilizando a estrutura do framework Next.js para aplicar os conceitos de renderização do React. Foi utilizado o hook useState() para gerenciar o estado dos valores interativos do card.  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack Utilizada
+- **Next.js**: Framework React para construção de aplicações web modernas e performáticas.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Como Testar
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Requisitos
+- Node.js instalado.
+- npm instalado.
 
-## Learn More
+### Passos para rodar o projeto
+1. Instale as dependências necessárias:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Acesse o aplicativo no navegador:
+   Abra [http://localhost:3000](http://localhost:3000) para visualizar o projeto em execução.
