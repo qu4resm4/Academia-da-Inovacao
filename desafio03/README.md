@@ -34,7 +34,6 @@ O desafio proposto para este projeto consiste em dividir o sistema proposto no [
 #### Requisitos:
 - Node.js
 - npm
-- Dependências adicionais não especificadas (?).
 
 #### Passos:
 1. Navegue até o diretório do frontend:
