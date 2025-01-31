@@ -80,10 +80,15 @@ O desafio proposto para este projeto consiste em dividir o sistema proposto no [
      npx prisma migrate deploy
    ```
 
-5. Inicie o servidor:
+5. Gere o Prisma Client:
+   ```bash
+      npx prisma generate
+   ```
+
+6. Inicie o servidor:
    ```bash
      nest start
    ```
 
-6. Acesse a API no navegador:
+7. Acesse a API no navegador:
    Abra [http://localhost:4000](http://localhost:4000) para interagir com a API.
