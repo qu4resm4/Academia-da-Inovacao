@@ -7,11 +7,13 @@ import {jwtDecode} from 'jwt-decode';
 
 export default function useUsers() {
     const URL = 'http://localhost:4000';
-    const token = Cookies.get('token') || '';
     let userId: string | undefined;
-    if(token != '' || token != null || token != undefined) {
-        const decodedToken = jwtDecode(token);
-        userId = decodedToken.sub;
+    if(Cookies.get('token')) {
+        const token = Cookies.get('token') || '';
+        if(token != '' || token != null || token != undefined) {
+            const decodedToken = jwtDecode(token);
+            userId = decodedToken.sub;
+        }
     }
         
 
